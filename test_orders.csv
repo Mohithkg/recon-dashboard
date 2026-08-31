@@ -1,0 +1,4 @@
+﻿order_id,order_date,customer_email,currency,gross_amount,discount,net_amount,status
+ORD-001,2026-01-15,alice@example.com,USD,100.00,10.00,90.00,completed
+ORD-002,2026-01-16,bob@example.com,EUR,250.00,0.00,250.00,pending
+ORD-003,2026-01-17,charlie@example.com,GBP,75.50,5.00,70.50,completed

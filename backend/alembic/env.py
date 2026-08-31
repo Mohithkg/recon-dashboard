@@ -9,7 +9,7 @@ from alembic import context
 
 from app.config import settings
 from app.database import Base
-from app.models import User  # noqa: F401 — ensures models are registered with Base.metadata
+from app.models import User, Order, Payment, Discrepancy  # noqa: F401 — registers models with Base.metadata
 
 config = context.config
 config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
