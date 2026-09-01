@@ -25,7 +25,7 @@ Ensure PostgreSQL is running and the `recon` database exists.  The default
 connection string is configured in `backend/.env`:
 
 ```
-DATABASE_URL=postgresql+asyncpg://postgres:aveto@localhost:5432/recon
+DATABASE_URL=postgresql+asyncpg://postgres:password@localhost:5432/recon
 ```
 
 ### Run migrations
