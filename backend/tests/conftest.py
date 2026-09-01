@@ -4,6 +4,9 @@ import pytest
 
 from app.reconcile import OrderData, PaymentData
 
+# Use asyncio mode for pytest-asyncio
+pytest_plugins = ["pytest_asyncio"]
+
 
 # ---------------------------------------------------------------------------
 # Helpers
