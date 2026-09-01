@@ -23,10 +23,10 @@ VALID_CURRENCIES = {"USD", "EUR", "GBP", "INR", "JPY", "CAD", "AUD", "CHF", "CNY
 
 
 def _clean_string_columns(df: pd.DataFrame) -> pd.DataFrame:
-    """Strip whitespace from all string columns."""
+    """Strip whitespace from all string columns and normalize null-like values to None."""
     for col in df.select_dtypes(include=["object"]).columns:
         df[col] = df[col].astype(str).str.strip()
-        df[col] = df[col].replace({"nan": None, "None": "", "": None})
+        df[col] = df[col].replace({"nan": None, "None": None, "": None})
     return df
 
 
