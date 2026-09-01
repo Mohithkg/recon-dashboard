@@ -35,11 +35,21 @@ async def explain(
     confidence.
     """
     discrepancy_ids = body.get("discrepancy_ids", [])
-    if not discrepancy_ids:
+    if not isinstance(discrepancy_ids, list) or not discrepancy_ids:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="Provide at least one discrepancy_id.",
+            detail="Provide a non-empty list of discrepancy_ids (integers).",
         )
+
+    # Validate every entry is a positive integer.
+    if not all(isinstance(i, int) and i > 0 for i in discrepancy_ids):
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="All discrepancy_ids must be positive integers.",
+        )
+
+    # De-duplicate while preserving order.
+    discrepancy_ids = list(dict.fromkeys(discrepancy_ids))
 
     # Fetch discrepancies scoped to the current user.
     result = await db.execute(

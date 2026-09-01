@@ -21,6 +21,9 @@ VALID_PAYMENT_COLUMNS = {
 
 VALID_CURRENCIES = {"USD", "EUR", "GBP", "INR", "JPY", "CAD", "AUD", "CHF", "CNY", "SGD"}
 
+# Reject uploads larger than 10 MB to prevent memory exhaustion.
+MAX_UPLOAD_BYTES = 10 * 1024 * 1024
+
 
 def _clean_string_columns(df: pd.DataFrame) -> pd.DataFrame:
     """Strip whitespace from all string columns and normalize null-like values to None."""
@@ -143,6 +146,13 @@ async def upload_orders(
         )
 
     content = await file.read()
+
+    if len(content) > MAX_UPLOAD_BYTES:
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            detail=f"File exceeds maximum size of {MAX_UPLOAD_BYTES // (1024 * 1024)} MB.",
+        )
+
     df = pd.read_csv(io.BytesIO(content))
 
     missing_cols = VALID_ORDER_COLUMNS - set(df.columns)
@@ -196,6 +206,13 @@ async def upload_payments(
         )
 
     content = await file.read()
+
+    if len(content) > MAX_UPLOAD_BYTES:
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            detail=f"File exceeds maximum size of {MAX_UPLOAD_BYTES // (1024 * 1024)} MB.",
+        )
+
     df = pd.read_csv(io.BytesIO(content))
 
     missing_cols = VALID_PAYMENT_COLUMNS - set(df.columns)

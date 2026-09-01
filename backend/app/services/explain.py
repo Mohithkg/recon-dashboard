@@ -197,7 +197,7 @@ async def explain_discrepancies(
             ],
         )
     except OpenAIError as e:
-        logger.error("OpenAI API call failed: %s", e)
+        logger.error("OpenAI API call failed: %s", _safe_error_message(e))
         raise ExplainError(
             f"OpenAI API call failed: {_safe_error_message(e)}"
         ) from e
@@ -210,7 +210,10 @@ async def explain_discrepancies(
     try:
         parsed = json.loads(content)
     except (json.JSONDecodeError, TypeError) as e:
-        logger.error("OpenAI returned malformed JSON: %s", content)
+        logger.error(
+            "OpenAI returned malformed JSON (truncated): %s",
+            content[:200] if content else "<empty>",
+        )
         raise ExplainError(
             "OpenAI returned a malformed response that could not be parsed."
         ) from e
@@ -219,7 +222,11 @@ async def explain_discrepancies(
     try:
         result = ExplanationResult(**parsed)
     except Exception as e:
-        logger.error("OpenAI response failed validation: %s | raw: %s", e, parsed)
+        logger.error(
+            "OpenAI response failed validation: %s | keys: %s",
+            e,
+            list(parsed.keys()) if isinstance(parsed, dict) else type(parsed).__name__,
+        )
         raise ExplainError(
             "OpenAI returned a response that did not match the expected format."
         ) from e
