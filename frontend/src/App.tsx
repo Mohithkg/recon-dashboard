@@ -1,32 +1,55 @@
-import { useEffect, useState } from 'react'
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider } from "./auth/AuthContext";
+import { ProtectedRoute } from "./components/ProtectedRoute";
+import { Layout } from "./components/Layout";
+import { Login } from "./pages/Login";
+import { Signup } from "./pages/Signup";
+import { Upload } from "./pages/Upload";
+import { Dashboard } from "./pages/Dashboard";
 
-interface HealthResponse {
-  status: string
-}
-
-function App() {
-  const [health, setHealth] = useState<HealthResponse | null>(null)
-  const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    fetch('/health')
-      .then((res) => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`)
-        return res.json()
-      })
-      .then((data: HealthResponse) => setHealth(data))
-      .catch((err: Error) => setError(err.message))
-  }, [])
-
+function AppRoutes() {
   return (
-    <div style={{ fontFamily: 'system-ui, sans-serif', padding: '2rem', maxWidth: 600, margin: '0 auto' }}>
-      <h1>Recon Dashboard</h1>
-      <h2>Backend Health</h2>
-      {error && <p style={{ color: 'red' }}>Error: {error}</p>}
-      {health && <p style={{ color: 'green' }}>Status: {health.status}</p>}
-      {!health && !error && <p>Loading...</p>}
-    </div>
-  )
+    <Routes>
+      {/* Public auth pages */}
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
+
+      {/* Protected app shell */}
+      <Route
+        path="/upload"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <Upload />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <Dashboard />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Default redirect */}
+      <Route path="/" element={<Navigate to="/upload" replace />} />
+      <Route path="*" element={<Navigate to="/upload" replace />} />
+    </Routes>
+  );
 }
 
-export default App
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AuthProvider>
+        <AppRoutes />
+      </AuthProvider>
+    </BrowserRouter>
+  );
+}
+
